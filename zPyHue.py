@@ -1,5 +1,5 @@
 #! /usr/bin/python
-
+#TODO - Make a list off UUIDS lights to light ID - This si for future plans
 
 import argparse
 import json
