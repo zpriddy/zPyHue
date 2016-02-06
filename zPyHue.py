@@ -94,7 +94,7 @@ class Bridge(object):
 			if response['error']['type'] == 101:
 				logging.info('Please press the hue button.')
 				sleep(3)
-				if (self._rCount < 30):
+				if (self._rCount < 30): 
 					self.register()
 				else:
 					raise HueButtonNotPressed("Hue button was not pressed in the last 60 seconds")
