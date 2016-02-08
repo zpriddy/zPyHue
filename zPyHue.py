@@ -19,7 +19,70 @@ class Light(object):
 		self._manufacturername = raw_data['manufacturername']
 		self._swversion = raw_data['swversion']
 		self._modelid = raw_data['modelid']
+		self._reachable = raw_data['state']['reachable']
+		self._on = raw_data['state']['on']
+		self._hue = raw_data['state']['hue']
+		self._sat = raw_data['state']['sat']
+		self._effect = raw_data['state']['effect']
+		self._xy = raw_data['state']['xy']
+		self._colormode = raw_data['state']['colormode']
+		self._alert = raw_data['state']['alert']
+		self._bri = raw_data['state']['bri']
+		self._reachable = raw_data['state']['reachable']
+		self._type = raw_data['type']
+
 		self._bridge = bridge
+
+	def get_atb(self, atb):
+		if atb == 'name':
+			return self._name
+		if atb == 'uniqueid':
+			return self._uniqueid
+		if atb == 'on':
+			return self._on
+		if atb == 'xy':
+			return self._xy
+		if atb == 'colormode':
+			return self._colormode
+		if atb == 'alert':
+			return self._alert
+		if atb == 'type':
+			return self._type
+		if atb == 'hue':
+			return self._hue
+		if atb == 'sat':
+			return self._sat
+		if atb == 'bri':
+			return self._bri			
+		if atb == 'reachable':
+			return self._reachable
+
+	@property
+	def hue(self):
+		return self._hue
+
+	@property
+	def sat(self):
+		return self._sat
+
+	@property
+	def bri(self):
+		return self._bri
+
+
+	@property
+	def xy(self):
+		return self._xy
+
+	@property
+	def on(self):
+		return self._on
+
+	
+
+
+	 
+	
 
 
 
@@ -63,8 +126,7 @@ class Bridge(object):
 		if method == 'GET':
 			if data:
 				r = requests.get(url, data=data)
-			else:
-				print 
+			else: 
 				r = requests.get(url)
 			if return_json:
 				return r.json()
@@ -114,6 +176,24 @@ class Bridge(object):
 		for light in lights:
 			self._lights.append(Light(lights[light], self))
 
+	def get_light(self, hid=None, name=None):
+		if not hid and not name:
+			return False
+		if hid and name:
+			return False
+
+
+		search_atb = 'uniqueid' if hid is not None else 'name'
+		search_val = hid if hid is not None else name
+
+		for light in self._lights:
+			if light.get_atb(search_atb) == search_val:
+				return light
+
+
+	def update(self):
+		self.get_lights()
+
 
 
 
@@ -131,13 +211,16 @@ def main():
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', '--debug', required=False, help='Allow Debugging', action='store_true')
+	parser.add_argument('-c', '--config', required=False, help='Mock Config File', action='store_true')
 
 	args = parser.parse_args()
 
 	if (setup(args)):
 		logging.info('Setup Finished')
-		myBridge = Bridge(config_file=True)
-		print myBridge.get_lights()
+	myBridge = Bridge(config_file=args.config)
+	myBridge.get_lights()
+	print myBridge.get_light(name='Floating Lamp 1').bri
+
 
 if __name__ == '__main__':
 	main()
